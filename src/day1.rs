@@ -7,8 +7,7 @@ use itertools::Itertools;
 
 fn read_input() -> Vec<i32> {
     let input_file = File::open("inputs/1").unwrap();
-    let buf_reader = BufReader::new(input_file);
-    buf_reader
+    BufReader::new(input_file)
         .lines()
         .map(|line| line.unwrap().parse().unwrap())
         .collect()
