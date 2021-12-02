@@ -3,7 +3,6 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-#[derive(Clone)]
 enum Direction {
     Forward,
     Down,
