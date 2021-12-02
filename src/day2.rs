@@ -3,15 +3,6 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use nom::{
-    branch::alt,
-    bytes::complete::tag,
-    character::complete::{digit1, space1},
-    combinator::{map_res, recognize, value},
-    sequence::tuple,
-    IResult,
-};
-
 #[derive(Clone)]
 enum Direction {
     Forward,
@@ -25,16 +16,13 @@ struct Instruction {
 }
 
 fn parse_instruction(input: &str) -> Instruction {
-    let direction = alt((
-        value(Direction::Forward, tag("forward")),
-        value(Direction::Down, tag("down")),
-        value(Direction::Up, tag("up")),
-    ));
-    let distance = map_res(recognize(digit1), str::parse::<i32>);
-
-    let parse_result: IResult<_, _> = tuple((direction, space1, distance))(input);
-    let (_, (direction, _, distance)) = parse_result.unwrap();
-
+    let (direction_str, distance_str) = input.split_once(' ').unwrap();
+    let direction = match direction_str {
+        "forward" => Direction::Forward,
+        "down" => Direction::Down,
+        _ => Direction::Up,
+    };
+    let distance = str::parse::<i32>(distance_str).unwrap();
     Instruction {
         direction,
         distance,
