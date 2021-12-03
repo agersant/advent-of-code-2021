@@ -79,5 +79,5 @@ pub fn part2() {
     }
     let oxygen_reading = binary_to_integer(oxygen_candidates[0]);
     let co2_reading = binary_to_integer(co2_candidates[0]);
-    println!("day 3.1 {}", oxygen_reading * co2_reading);
+    println!("day 3.2 {}", oxygen_reading * co2_reading);
 }
