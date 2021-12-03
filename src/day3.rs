@@ -71,8 +71,8 @@ fn filter_candidates(candidates: Vec<&Vec<bool>>, digit: usize, invert: bool) ->
 pub fn part2() {
     let lines = read_input();
     let num_digits = lines[0].len();
-    let mut oxygen_candidates: Vec<&Vec<bool>> = lines.iter().collect();
-    let mut co2_candidates: Vec<&Vec<bool>> = lines.iter().collect();
+    let mut oxygen_candidates = lines.iter().collect();
+    let mut co2_candidates = lines.iter().collect();
     for i in 0..num_digits {
         oxygen_candidates = filter_candidates(oxygen_candidates, i, false);
         co2_candidates = filter_candidates(co2_candidates, i, true);
