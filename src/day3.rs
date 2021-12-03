@@ -3,6 +3,8 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+use itertools::Itertools;
+
 fn read_input() -> Vec<Vec<bool>> {
     let input_file = File::open("inputs/3").unwrap();
     BufReader::new(input_file)
@@ -48,12 +50,20 @@ fn filter_candidates(candidates: Vec<&Vec<bool>>, digit: usize, invert: bool) ->
     if candidates.len() <= 1 {
         return candidates;
     }
-    let num_ones = candidates.iter().filter(|l| l[digit]).count();
-    let num_zeroes = candidates.len() - num_ones;
-    if (num_ones >= num_zeroes) ^ invert {
-        candidates.into_iter().filter(|l| l[digit]).collect()
+    let ones = candidates
+        .to_owned()
+        .into_iter()
+        .filter(|l| l[digit])
+        .collect_vec();
+    let zeroes = candidates
+        .to_owned()
+        .into_iter()
+        .filter(|l| !l[digit])
+        .collect_vec();
+    if (ones.len() >= zeroes.len()) ^ invert {
+        ones
     } else {
-        candidates.into_iter().filter(|l| !l[digit]).collect()
+        zeroes
     }
 }
 
