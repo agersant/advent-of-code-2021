@@ -1,4 +1,5 @@
 use std::{
+    fmt::Debug,
     fs::File,
     io::{BufRead, BufReader},
 };
@@ -7,36 +8,40 @@ use itertools::Itertools;
 
 fn read_input() -> (Vec<u8>, Vec<Board>) {
     let input_file = File::open("inputs/4").unwrap();
-    let mut lines = BufReader::new(input_file).lines();
+    let mut lines = BufReader::new(input_file)
+        .lines()
+        .map(|l| l.unwrap())
+        .filter(|l| l.len() > 0);
 
     let guesses = lines
         .next()
-        .unwrap()
         .unwrap()
         .split(',')
         .map(|n| n.parse().unwrap())
         .collect_vec();
 
-    let mut boards: Vec<Board> = vec![];
-    for board_string in lines
-        .map(|l| l.unwrap())
-        .filter(|l| l.len() > 0)
+    let boards = lines
         .chunks(5)
         .into_iter()
-        .map(|d| d.collect_vec())
-    {
-        let mut board = Board::default();
-        for i in 0..5 {
-            board.data[i] = board_string[i]
-                .split_ascii_whitespace()
-                .map(|n| n.parse().unwrap())
-                .collect_vec()
-                .as_slice()
+        .map(|board_input| {
+            let data: [[u8; 5]; 5] = board_input
+                .map(|row_data| {
+                    row_data
+                        .split_ascii_whitespace()
+                        .map(|n| n.parse().unwrap())
+                        .collect_vec()[..]
+                        .try_into()
+                        .unwrap()
+                })
+                .collect_vec()[..]
                 .try_into()
                 .unwrap();
-        }
-        boards.push(board)
-    }
+            Board {
+                data,
+                ..Default::default()
+            }
+        })
+        .collect_vec();
 
     (guesses, boards)
 }
