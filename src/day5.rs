@@ -1,23 +1,14 @@
 use itertools::Itertools;
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
-use tuple::Map;
+use serde_scan::scan;
+use std::fs;
 
 type Point = (usize, usize);
 
 fn read_input() -> Vec<(Point, Point)> {
-    let input_file = File::open("inputs/5").unwrap();
-    BufReader::new(input_file)
+    let raw_data = fs::read_to_string("inputs/5").unwrap();
+    raw_data
         .lines()
-        .map(|line| -> (Point, Point) {
-            line.unwrap()
-                .split_once(" -> ")
-                .unwrap()
-                .map(|p| p.split_once(",").unwrap().map(|s| s.parse().unwrap()))
-                .to_owned()
-        })
+        .map(|line| -> (Point, Point) { scan!("{},{} -> {},{}" <- line).unwrap() })
         .collect()
 }
 
