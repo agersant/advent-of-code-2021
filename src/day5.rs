@@ -29,9 +29,7 @@ fn solve(manhattan: bool) -> usize {
             .filter(|(a, b)| a.0 == b.0 || a.1 == b.1)
             .collect_vec();
     }
-    let x_max = segments.iter().map(|(a, b)| a.0.max(b.0)).max().unwrap();
-    let y_max = segments.iter().map(|(a, b)| a.1.max(b.1)).max().unwrap();
-    let mut map = vec![vec![0; 1 + x_max]; 1 + y_max];
+    let mut map = vec![vec![0; 1000]; 1000];
 
     for (a, b) in &segments {
         let x_step = (b.0 as i32 - a.0 as i32).signum();
