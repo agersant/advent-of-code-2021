@@ -60,5 +60,5 @@ pub fn part1() {
 
 #[allow(dead_code)]
 pub fn part2() {
-    println!("day 5.1 {}", solve(false));
+    println!("day 5.2 {}", solve(false));
 }
