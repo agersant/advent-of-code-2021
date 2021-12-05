@@ -1,6 +1,6 @@
 use itertools::Itertools;
 use serde_scan::scan;
-use std::fs;
+use std::{collections::HashMap, fs};
 
 type Point = (usize, usize);
 
@@ -13,21 +13,21 @@ fn read_input() -> Vec<(Point, Point)> {
 }
 
 fn solve(manhattan: bool) -> usize {
-    let mut segments = read_input().into_iter().collect_vec();
+    let mut segments = read_input();
     if manhattan {
         segments = segments
             .into_iter()
             .filter(|(a, b)| a.0 == b.0 || a.1 == b.1)
             .collect_vec();
     }
-    let mut map = vec![vec![0; 1000]; 1000];
+    let mut map = HashMap::new();
 
     for (a, b) in &segments {
         let x_step = (b.0 as i32 - a.0 as i32).signum();
         let y_step = (b.1 as i32 - a.1 as i32).signum();
         let (mut x, mut y) = *a;
         loop {
-            map[y][x] += 1;
+            *map.entry((x, y)).or_insert(0) += 1;
             if (x, y) == *b {
                 break;
             }
@@ -36,10 +36,7 @@ fn solve(manhattan: bool) -> usize {
         }
     }
 
-    map.iter()
-        .flat_map(|r| r.iter())
-        .filter(|v| **v > 1)
-        .count()
+    map.values().filter(|&&v| v > 1).count()
 }
 
 #[allow(dead_code)]
