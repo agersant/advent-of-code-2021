@@ -20,9 +20,8 @@ fn solve(num_days: u32) -> u64 {
         population[i as usize] += 1;
     }
     for _day in 0..num_days {
-        let num_to_spawn = population[0];
         population.rotate_left(1);
-        population[6] += num_to_spawn;
+        population[6] += population[8];
     }
     population.iter().sum()
 }
