@@ -73,7 +73,7 @@ fn solve(cost: CostFn) -> i32 {
 #[allow(dead_code)]
 pub fn part1() {
     let cost: CostFn = |a, b| (a - b).abs();
-    println!("day 7.2 {}", solve(cost));
+    println!("day 7.1 {}", solve(cost));
 }
 
 #[allow(dead_code)]
