@@ -58,7 +58,7 @@ impl Cave {
             .map(move |(p, n)| (p % w, p / w, *n))
     }
 
-    fn flood_fill(&mut self, height_map: &Cave, x: usize, y: usize, value: i32) -> usize {
+    fn flood_fill(&mut self, height_map: &Cave, x: usize, y: usize) -> usize {
         let mut num_tiles = 0;
         let mut todo = vec![(x, y)];
         let mut done = HashSet::<(usize, usize)>::from_iter(todo.iter().copied());
@@ -66,7 +66,7 @@ impl Cave {
             if height_map.data[y][x] == 9 {
                 continue;
             }
-            self.data[y][x] = value;
+            self.data[y][x] = 9;
             num_tiles += 1;
             for (x, y, _) in self.neighbours(x, y) {
                 if !done.contains(&(x, y)) {
@@ -102,11 +102,9 @@ pub fn part2() {
         data: vec![vec![0; w]; h],
     };
     let mut sizes = vec![];
-    let mut next_basin = 1;
     for (x, y, _n) in height_map.traverse() {
         if basins.data[y][x] == 0 {
-            sizes.push(basins.flood_fill(&height_map, x, y, next_basin));
-            next_basin += 1;
+            sizes.push(basins.flood_fill(&height_map, x, y));
         }
     }
     let result: usize = sizes.iter().sorted().rev().take(3).product();
