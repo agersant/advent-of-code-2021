@@ -66,7 +66,7 @@ impl Cave {
             if height_map.data[y][x] == 9 {
                 continue;
             }
-            self.data[y][x] = 9;
+            self.data[y][x] = 1;
             num_tiles += 1;
             for (x, y, _) in self.neighbours(x, y) {
                 if !done.contains(&(x, y)) {
