@@ -58,7 +58,8 @@ impl Cave {
             .map(move |(p, n)| (p % w, p / w, *n))
     }
 
-    fn flood_fill(&mut self, height_map: &Cave, x: usize, y: usize, value: i32) {
+    fn flood_fill(&mut self, height_map: &Cave, x: usize, y: usize, value: i32) -> usize {
+        let mut num_tiles = 0;
         let mut todo = vec![(x, y)];
         let mut done = HashSet::<(usize, usize)>::from_iter(todo.iter().copied());
         while let Some((x, y)) = todo.pop() {
@@ -66,6 +67,7 @@ impl Cave {
                 continue;
             }
             self.data[y][x] = value;
+            num_tiles += 1;
             for (x, y, _) in self.neighbours(x, y) {
                 if !done.contains(&(x, y)) {
                     todo.push((x, y));
@@ -73,6 +75,7 @@ impl Cave {
                 }
             }
         }
+        num_tiles
     }
 }
 
@@ -98,21 +101,14 @@ pub fn part2() {
     let mut basins = Cave {
         data: vec![vec![0; w]; h],
     };
-
+    let mut sizes = vec![];
     let mut next_basin = 1;
     for (x, y, _n) in height_map.traverse() {
         if basins.data[y][x] == 0 {
-            basins.flood_fill(&height_map, x, y, next_basin);
+            sizes.push(basins.flood_fill(&height_map, x, y, next_basin));
             next_basin += 1;
         }
     }
-
-    let result: usize = (1..next_basin)
-        .map(|i| basins.traverse().filter(|(_, _, v)| i == *v).count())
-        .sorted()
-        .rev()
-        .take(3)
-        .product();
-
+    let result: usize = sizes.iter().sorted().rev().take(3).product();
     println!("day 9.2 {}", result);
 }
