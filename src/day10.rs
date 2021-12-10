@@ -27,10 +27,9 @@ fn parse(line: &str) -> Result<Vec<char>, char> {
 pub fn part1() {
     let lines = read_input();
     let values = HashMap::from([(')', 3), (']', 57), ('}', 1197), ('>', 25137)]);
-    let scores = lines.iter().map(|line| match parse(line) {
-        Ok(_stack) => 0,
-        Err(char) => values[&char],
-    });
+    let scores = lines
+        .iter()
+        .filter_map(|line| parse(line).err().map(|c| values[&c]));
     println!("day 10.1 {}", scores.sum::<u64>());
 }
 
@@ -40,14 +39,10 @@ pub fn part2() {
     let values = HashMap::from([('(', 1), ('[', 2), ('{', 3), ('<', 4)]);
     let scores = lines
         .iter()
-        .filter_map(|line| match parse(line) {
-            Err(_char) => None,
-            Ok(stack) => Some(
-                stack
-                    .iter()
-                    .rev()
-                    .fold(0_u64, |score, char| score * 5 + values[char]),
-            ),
+        .filter_map(|line| {
+            parse(line)
+                .map(|stack| stack.iter().rev().fold(0_u64, |s, c| s * 5 + values[c]))
+                .ok()
         })
         .sorted()
         .collect_vec();
