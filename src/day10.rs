@@ -1,6 +1,5 @@
-use std::{collections::HashMap, fs};
-
 use itertools::Itertools;
+use std::{collections::HashMap, fs};
 
 fn read_input() -> Vec<String> {
     let raw_data = fs::read_to_string("inputs/10").unwrap();
