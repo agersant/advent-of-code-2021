@@ -25,22 +25,20 @@ fn neighbours(map: &mut Vec<Vec<u8>>, x: usize, y: usize) -> impl Iterator<Item 
 
 fn step(map: &mut Vec<Vec<u8>>) -> usize {
     let (w, h) = size(map);
-    for (x, y) in (0..w).cartesian_product(0..h) {
-        map[y][x] += 1;
-    }
     let mut flashed = HashSet::new();
     let mut todo = (0..w).cartesian_product(0..h).collect_vec();
     while let Some((x, y)) = todo.pop() {
-        if flashed.contains(&(x, y)) || map[y][x] <= 9 {
+        if flashed.contains(&(x, y)) {
+            continue;
+        }
+        map[y][x] += 1;
+        if map[y][x] <= 9 {
             continue;
         }
         flashed.insert((x, y));
         map[y][x] = 0;
         for (x, y) in neighbours(map, x, y) {
-            if !flashed.contains(&(x, y)) {
-                map[y][x] += 1;
-                todo.push((x, y));
-            }
+            todo.push((x, y));
         }
     }
     flashed.len()
