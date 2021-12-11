@@ -62,5 +62,5 @@ pub fn part2() {
     while step(&mut map) != w * h {
         result += 1;
     }
-    println!("day 11.1 {}", result);
+    println!("day 11.2 {}", result);
 }
