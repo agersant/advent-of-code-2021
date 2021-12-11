@@ -17,21 +17,10 @@ fn size(map: &Vec<Vec<u8>>) -> (usize, usize) {
     (map[0].len(), map.len())
 }
 
-fn neighbours_mut(
-    map: &mut Vec<Vec<u8>>,
-    x: usize,
-    y: usize,
-) -> impl Iterator<Item = (usize, usize, &mut u8)> + '_ {
-    let (w, _h) = size(map);
-    map.iter_mut()
-        .flat_map(|row| row.iter_mut())
-        .enumerate()
-        .map(move |(p, n)| (p % w, p / w, n))
-        .filter(move |(rx, ry, _n)| {
-            (*rx as i32 - x as i32).abs() <= 1
-                && (*ry as i32 - y as i32).abs() <= 1
-                && (*rx != x || *ry != y)
-        })
+fn neighbours(map: &mut Vec<Vec<u8>>, x: usize, y: usize) -> impl Iterator<Item = (usize, usize)> {
+    let (w, h) = size(map);
+    (x.saturating_sub(1)..=(w - 1).min(x + 1))
+        .cartesian_product(y.saturating_sub(1)..=(h - 1).min(y + 1))
 }
 
 fn step(map: &mut Vec<Vec<u8>>) -> usize {
@@ -47,9 +36,9 @@ fn step(map: &mut Vec<Vec<u8>>) -> usize {
         }
         flashed.insert((x, y));
         map[y][x] = 0;
-        for (x, y, n) in neighbours_mut(map, x, y) {
+        for (x, y) in neighbours(map, x, y) {
             if !flashed.contains(&(x, y)) {
-                *n += 1;
+                map[y][x] += 1;
                 todo.push((x, y));
             }
         }
@@ -70,7 +59,7 @@ pub fn part1() {
 #[allow(dead_code)]
 pub fn part2() {
     let mut map = read_input();
-    let (w, h) = size(&mut map);
+    let (w, h) = size(&map);
     let mut result = 1;
     while step(&mut map) != w * h {
         result += 1;
