@@ -44,15 +44,12 @@ fn explore(maze: &Maze, path: Path, allow_double: bool) -> Vec<Path> {
     }
     let mut paths = Vec::new();
     if maze.contains_key(from) {
-        for to in &maze[from] {
-            if to != "start" {
-                let is_big = to.to_lowercase() != *to;
-                if is_big
-                    || (allow_double && path.visits.values().copied().max().unwrap_or_default() < 2)
-                    || path.visits.get(to).copied().unwrap_or_default() == 0
-                {
-                    paths.extend(explore(maze, path.visit(to), allow_double));
-                }
+        for to in maze[from].iter().filter(|c| *c != "start") {
+            if to.to_lowercase() != *to
+                || (allow_double && path.visits.values().copied().max().unwrap_or_default() < 2)
+                || path.visits.get(to).copied().unwrap_or_default() == 0
+            {
+                paths.extend(explore(maze, path.visit(to), allow_double));
             }
         }
     }
