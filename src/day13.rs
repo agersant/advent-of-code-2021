@@ -2,7 +2,6 @@ use itertools::Itertools;
 use serde_scan::scan;
 use std::{collections::HashSet, fs};
 
-#[derive(Debug)]
 enum Fold {
     Horizontal(usize),
     Vertical(usize),
