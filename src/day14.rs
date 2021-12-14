@@ -1,6 +1,5 @@
-use std::{collections::HashMap, fs, mem};
-
 use itertools::Itertools;
+use std::{collections::HashMap, fs, mem};
 
 type Rules = HashMap<(char, char), char>;
 
@@ -44,25 +43,24 @@ impl Polymer {
     }
 }
 
-fn read_input() -> (String, Rules) {
+fn read_input() -> (Polymer, Rules) {
     let raw_data = fs::read_to_string("inputs/14").unwrap();
-    let mut template = String::new();
+    let mut polymer = None;
     let mut rules = Rules::new();
     for line in raw_data.lines() {
         if line.contains("->") {
             let (a, b, c) = line.replace(" -> ", "").chars().collect_tuple().unwrap();
             rules.insert((a, b), c);
-        } else {
-            template += line;
+        } else if line.len() > 0 {
+            polymer = Some(Polymer::new(&line));
         }
     }
-    (template, rules)
+    (polymer.unwrap(), rules)
 }
 
 #[allow(dead_code)]
 pub fn part1() {
-    let (template, rules) = read_input();
-    let mut polymer = Polymer::new(&template);
+    let (mut polymer, rules) = read_input();
     for _ in 0..10 {
         polymer = polymer.expand(&rules);
     }
@@ -71,8 +69,7 @@ pub fn part1() {
 
 #[allow(dead_code)]
 pub fn part2() {
-    let (template, rules) = read_input();
-    let mut polymer = Polymer::new(&template);
+    let (mut polymer, rules) = read_input();
     for _ in 0..40 {
         polymer = polymer.expand(&rules);
     }
