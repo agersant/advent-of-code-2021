@@ -20,14 +20,24 @@ impl Polymer {
         Polymer { pairs, counts }
     }
 
+    fn expand(mut self, rules: &Rules) -> Polymer {
+        let mut counts = mem::take(&mut self.counts);
+        let mut pairs = HashMap::new();
+        for ((a, b), n) in self.pairs {
+            match rules.get(&(a, b)) {
+                Some(c) => {
+                    *pairs.entry((a, *c)).or_default() += n;
+                    *pairs.entry((*c, b)).or_default() += n;
+                    *counts.entry(*c).or_default() += n;
+                }
+                None => *pairs.entry((a, b)).or_default() += n,
+            }
+        }
+        Polymer { pairs, counts }
+    }
+
     fn measure(&self) -> u64 {
-        let (min, max) = self
-            .counts
-            .iter()
-            .map(|(_c, n)| n)
-            .minmax()
-            .into_option()
-            .unwrap();
+        let (min, max) = self.counts.values().minmax().into_option().unwrap();
         max - min
     }
 }
@@ -49,28 +59,12 @@ fn read_input() -> (String, Rules) {
     (template, rules)
 }
 
-fn expand(mut polymer: Polymer, rules: &Rules) -> Polymer {
-    let mut counts = mem::take(&mut polymer.counts);
-    let mut pairs = HashMap::new();
-    for ((a, b), n) in polymer.pairs {
-        match rules.get(&(a, b)) {
-            Some(c) => {
-                *pairs.entry((a, *c)).or_default() += n;
-                *pairs.entry((*c, b)).or_default() += n;
-                *counts.entry(*c).or_default() += n;
-            }
-            None => *pairs.entry((a, b)).or_default() += n,
-        }
-    }
-    Polymer { pairs, counts }
-}
-
 #[allow(dead_code)]
 pub fn part1() {
     let (template, rules) = read_input();
     let mut polymer = Polymer::new(&template);
     for _ in 0..10 {
-        polymer = expand(polymer, &rules);
+        polymer = polymer.expand(&rules);
     }
     println!("14.1 {}", polymer.measure());
 }
@@ -80,7 +74,7 @@ pub fn part2() {
     let (template, rules) = read_input();
     let mut polymer = Polymer::new(&template);
     for _ in 0..40 {
-        polymer = expand(polymer, &rules);
+        polymer = polymer.expand(&rules);
     }
     println!("14.2 {}", polymer.measure());
 }
