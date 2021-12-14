@@ -2,6 +2,8 @@ use std::{collections::HashMap, fs, mem};
 
 use itertools::Itertools;
 
+type Rules = HashMap<(char, char), char>;
+
 struct Polymer {
     pairs: HashMap<(char, char), u64>,
     counts: HashMap<char, u64>,
@@ -41,8 +43,6 @@ impl Polymer {
         max - min
     }
 }
-
-type Rules = HashMap<(char, char), char>;
 
 fn read_input() -> (String, Rules) {
     let raw_data = fs::read_to_string("inputs/14").unwrap();
