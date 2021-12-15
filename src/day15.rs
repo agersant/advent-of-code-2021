@@ -49,8 +49,8 @@ pub fn part2() {
     let (w, h) = (5 * tile_w, 5 * tile_h);
     let goal = (w - 1, h - 1);
     let cost_fn = |(x, y): (usize, usize)| {
-        let tile = (x / tile_w + y / tile_h) as i32;
-        let cost = 1 + ((maze[y % tile_h][x % tile_w] as i32 + tile + 8) % 9);
+        let tile = x / tile_w + y / tile_h;
+        let cost = 1 + ((maze[y % tile_h][x % tile_w] as usize + tile + 8) % 9);
         cost as u32
     };
     println!("15.2 {}", solve(&goal, cost_fn));
