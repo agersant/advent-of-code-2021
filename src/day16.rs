@@ -83,7 +83,7 @@ fn decode(hex_input: &str) -> Packet {
     packet
 }
 
-fn read_bits(input: &str) -> u32 {
+fn read_integer(input: &str) -> u32 {
     input
         .chars()
         .rev()
@@ -98,8 +98,8 @@ fn read_bits(input: &str) -> u32 {
 fn read_literal(mut input: &str) -> (u64, &str) {
     let mut res = 0;
     loop {
-        let keep_reading = read_bits(&input[0..1]) == 1;
-        let chunk = read_bits(&input[1..5]);
+        let keep_reading = read_integer(&input[0..1]) == 1;
+        let chunk = read_integer(&input[1..5]);
         res = (res << 4) + chunk as u64;
         input = &input[5..];
         if !keep_reading {
@@ -110,17 +110,17 @@ fn read_literal(mut input: &str) -> (u64, &str) {
 }
 
 fn read_packet(input: &str) -> (Packet, &str) {
-    let version = read_bits(&input[0..3]) as u8;
-    let type_id = read_bits(&input[3..6]) as u8;
+    let version = read_integer(&input[0..3]) as u8;
+    let type_id = read_integer(&input[3..6]) as u8;
     match type_id {
         4 => {
             let (value, tail) = read_literal(&input[6..]);
             (Packet::new_literal(version, value), tail)
         }
         _ => {
-            let length_type_id = read_bits(&input[6..7]);
+            let length_type_id = read_integer(&input[6..7]);
             if length_type_id == 0 {
-                let sub_packets_length = read_bits(&input[7..22]) as usize;
+                let sub_packets_length = read_integer(&input[7..22]) as usize;
                 let mut sub_packets_str = &input[22..(22 + sub_packets_length)];
                 let mut sub_packets = Vec::new();
                 while !sub_packets_str.is_empty() {
@@ -133,7 +133,7 @@ fn read_packet(input: &str) -> (Packet, &str) {
                     &input[(22 + sub_packets_length)..],
                 )
             } else {
-                let num_sub_packets = read_bits(&input[7..18]) as usize;
+                let num_sub_packets = read_integer(&input[7..18]) as usize;
                 let mut remaining_data = &input[18..];
                 let mut sub_packets = Vec::new();
                 while sub_packets.len() < num_sub_packets {
@@ -171,11 +171,11 @@ fn test_decode_hex() {
 }
 
 #[test]
-fn test_read_bits() {
-    assert_eq!(read_bits("000000"), 0);
-    assert_eq!(read_bits("000010"), 2);
-    assert_eq!(read_bits("000010"), 2);
-    assert_eq!(read_bits("10111"), 23);
+fn test_read_integer() {
+    assert_eq!(read_integer("000000"), 0);
+    assert_eq!(read_integer("000010"), 2);
+    assert_eq!(read_integer("000010"), 2);
+    assert_eq!(read_integer("10111"), 23);
 }
 
 #[test]
