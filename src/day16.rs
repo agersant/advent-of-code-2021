@@ -8,6 +8,23 @@ struct Packet {
     payload: Payload,
 }
 
+#[derive(Debug, PartialEq, Eq)]
+enum Op {
+    Sum,
+    Product,
+    Minimum,
+    Maximum,
+    GreaterThan,
+    LessThan,
+    Equal,
+}
+
+#[derive(Debug, PartialEq, Eq)]
+enum Payload {
+    Literal(u64),
+    Operator((Op, Vec<Packet>)),
+}
+
 impl Packet {
     fn new_literal(version: u8, value: u64) -> Packet {
         Packet {
@@ -20,13 +37,13 @@ impl Packet {
         Packet {
             version,
             payload: match type_id {
-                0 => Payload::Sum(sub_packets),
-                1 => Payload::Product(sub_packets),
-                2 => Payload::Minimum(sub_packets),
-                3 => Payload::Maximum(sub_packets),
-                5 => Payload::GreaterThan(sub_packets),
-                6 => Payload::LessThan(sub_packets),
-                _ => Payload::Equal(sub_packets),
+                0 => Payload::Operator((Op::Sum, sub_packets)),
+                1 => Payload::Operator((Op::Product, sub_packets)),
+                2 => Payload::Operator((Op::Minimum, sub_packets)),
+                3 => Payload::Operator((Op::Maximum, sub_packets)),
+                5 => Payload::Operator((Op::GreaterThan, sub_packets)),
+                6 => Payload::Operator((Op::LessThan, sub_packets)),
+                _ => Payload::Operator((Op::Equal, sub_packets)),
             },
         }
     }
@@ -35,58 +52,22 @@ impl Packet {
         self.version as u64
             + match &self.payload {
                 Payload::Literal(_) => 0_u64,
-                Payload::Sum(sp)
-                | Payload::Product(sp)
-                | Payload::Minimum(sp)
-                | Payload::Maximum(sp)
-                | Payload::GreaterThan(sp)
-                | Payload::LessThan(sp)
-                | Payload::Equal(sp) => sp.iter().map(|p| p.sum_versions()).sum(),
+                Payload::Operator((_, sp)) => sp.iter().map(|p| p.sum_versions()).sum(),
             }
     }
 
     fn eval(&self) -> u64 {
         match &self.payload {
             Payload::Literal(n) => *n,
-            Payload::Sum(sp) => sp.iter().map(|p| p.eval()).sum(),
-            Payload::Product(sp) => sp.iter().map(|p| p.eval()).product(),
-            Payload::Minimum(sp) => sp.iter().map(|p| p.eval()).min().unwrap(),
-            Payload::Maximum(sp) => sp.iter().map(|p| p.eval()).max().unwrap(),
-            Payload::GreaterThan(sp) => {
-                if sp[0].eval() > sp[1].eval() {
-                    1
-                } else {
-                    0
-                }
-            }
-            Payload::LessThan(sp) => {
-                if sp[0].eval() < sp[1].eval() {
-                    1
-                } else {
-                    0
-                }
-            }
-            Payload::Equal(sp) => {
-                if sp[0].eval() == sp[1].eval() {
-                    1
-                } else {
-                    0
-                }
-            }
+            Payload::Operator((Op::Sum, sp)) => sp.iter().map(|p| p.eval()).sum(),
+            Payload::Operator((Op::Product, sp)) => sp.iter().map(|p| p.eval()).product(),
+            Payload::Operator((Op::Minimum, sp)) => sp.iter().map(|p| p.eval()).min().unwrap(),
+            Payload::Operator((Op::Maximum, sp)) => sp.iter().map(|p| p.eval()).max().unwrap(),
+            Payload::Operator((Op::GreaterThan, sp)) => (sp[0].eval() > sp[1].eval()) as u64,
+            Payload::Operator((Op::LessThan, sp)) => (sp[0].eval() < sp[1].eval()) as u64,
+            Payload::Operator((Op::Equal, sp)) => (sp[0].eval() == sp[1].eval()) as u64,
         }
     }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-enum Payload {
-    Literal(u64),
-    Sum(Vec<Packet>),
-    Product(Vec<Packet>),
-    Minimum(Vec<Packet>),
-    Maximum(Vec<Packet>),
-    GreaterThan(Vec<Packet>),
-    LessThan(Vec<Packet>),
-    Equal(Vec<Packet>),
 }
 
 fn decode_hex(hex_input: &str) -> String {
@@ -248,4 +229,10 @@ fn test_eval() {
     assert_eq!(decode("F600BC2D8F").eval(), 0);
     assert_eq!(decode("9C005AC2F8F0").eval(), 0);
     assert_eq!(decode("9C0141080250320F1802104A08").eval(), 1);
+}
+
+#[test]
+fn test_puzzle_input() {
+    assert_eq!(decode(INPUT).sum_versions(), 929);
+    assert_eq!(decode(INPUT).eval(), 911945136934);
 }
