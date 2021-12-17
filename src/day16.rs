@@ -153,13 +153,13 @@ fn read_packet(input: &str) -> (Packet, &str) {
 #[allow(dead_code)]
 pub fn part1() {
     let transmission = decode(INPUT);
-    println!("15.1 {}", transmission.sum_versions());
+    println!("16.1 {}", transmission.sum_versions());
 }
 
 #[allow(dead_code)]
 pub fn part2() {
     let transmission = decode(INPUT);
-    println!("15.2 {}", transmission.eval());
+    println!("16.2 {}", transmission.eval());
 }
 
 #[test]
